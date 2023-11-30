@@ -1,10 +1,9 @@
 name: Hello World Workflow
 
 on:
-  workflow_run:
-    workflows: ["Hello World Workflow"]
-    types:
-      - completed
+  push:
+    branches:
+      - main
 
 jobs:
   hello_world_job:
@@ -25,14 +24,18 @@ jobs:
     outputs:
       steps: context
     steps:
-      - name: Approve Job
+      - name: Manual Approval
         id: approve_step
-        run: echo "This job requires manual approval."
-
+        run: echo "approved"
+          
   welcome_message_job:
     needs: hello_world_job
     runs-on: ubuntu-latest
-    if: success() && github.event_name == 'workflow_run' && needs.approve_job.outputs.approve_step == 'success'
+    if: success() && github.event_name == 'push' && needs.approve_job.outputs.approve_step == matrix.approval
+
+    strategy:
+      matrix:
+        approval: ["approved"]
 
     steps:
       - name: Print Welcome Message
