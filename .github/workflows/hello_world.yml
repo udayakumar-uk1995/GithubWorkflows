@@ -10,9 +10,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
-    - name: Hello World
-      run: |
-        echo "Hello, World!"
+      - name: Hello World
+        id: hello_world_step
+        run: |
+          echo "Hello, World!"
+          echo "::set-output name=message::Hello, World!"
+
+  welcome_message_job:
+    needs: hello_world_job
+    runs-on: ubuntu-latest
+    if: success()
+
+    steps:
+      - name: Print Welcome Message
+        run: echo "${{ needs.hello_world_job.outputs.message }}"
